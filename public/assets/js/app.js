@@ -48,6 +48,15 @@ function openBarcodeScanner(mode) {
     if (result) result.classList.add('d-none');
     if (container) container.innerHTML = '';
 
+    if (typeof Html5Qrcode === 'undefined') {
+        loadScript('https://cdn.jsdelivr.net/npm/html5-qrcode/dist/html5-qrcode.min.js', function () {
+            startScanner();
+        });
+        return;
+    }
+    startScanner();
+
+    function startScanner() {
     Html5Qrcode.getCameras().then(function (cameras) {
         if (cameras.length === 0) { alert('No camera found.'); return; }
         const cameraId = cameras[cameras.length - 1].id;
@@ -66,10 +75,19 @@ function openBarcodeScanner(mode) {
             alert('Camera error: ' + err);
             closeBarcodeScanner();
         });
-    }).catch(function (err) {
-        alert('Camera access denied: ' + err);
-        closeBarcodeScanner();
+        }).catch(function (err) {
+            alert('Camera access denied: ' + err);
+            closeBarcodeScanner();
+        });
     });
+    }
+}
+
+function loadScript(url, callback) {
+    var script = document.createElement('script');
+    script.src = url;
+    script.onload = callback;
+    document.head.appendChild(script);
 }
 
 function closeBarcodeScanner() {
