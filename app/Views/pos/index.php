@@ -165,12 +165,17 @@ $currencySymbol = e($currencySymbol);
     </div>
 </div>
 
-<div id="receiptToast" class="toast position-fixed bottom-0 end-0 m-3 d-none" role="alert" aria-live="assertive" aria-atomic="true">
-    <div class="toast-header bg-success text-white">
-        <strong class="me-auto"><i class="bi bi-check-circle"></i> <?= __('pos.sale_complete') ?></strong>
-        <button type="button" class="btn-close btn-close-white" onclick="resetPOS()"></button>
+<div id="receiptOverlay" class="receipt-overlay d-none">
+    <div class="receipt-modal">
+        <div class="receipt-modal-header">
+            <i class="bi bi-check-circle"></i> <?= __('pos.sale_complete') ?>
+        </div>
+        <div class="receipt-modal-body" id="receiptBody"></div>
+        <div class="receipt-modal-footer">
+            <button class="btn btn-outline-primary" onclick="window.print()"><i class="bi bi-printer"></i> <?= __('common.print') ?></button>
+            <button class="btn btn-success" onclick="resetPOS()"><i class="bi bi-plus-lg"></i> <?= __('pos.new_sale') ?></button>
+        </div>
     </div>
-    <div class="toast-body" id="receiptBody"></div>
 </div>
 
 <script>

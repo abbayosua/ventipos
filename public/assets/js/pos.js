@@ -382,26 +382,18 @@ async function completeSale() {
             return;
         }
 
-        // Show receipt toast
-        const toast = document.getElementById('receiptToast');
+        // Show receipt overlay
+        const overlay = document.getElementById('receiptOverlay');
         const body = document.getElementById('receiptBody');
         body.innerHTML = `
-            <div class="text-center mb-2">
-                <strong>${data.invoice_no}</strong>
-            </div>
-            ${cart.map(item => `<div class="d-flex justify-content-between small"><span>${escapeHtml(item.name)} × ${item.quantity}</span><span>${currencySymbol}${(item.price * item.quantity).toFixed(2)}</span></div>`).join('')}
-            <hr class="my-1">
+            <div class="text-center mb-3 fw-bold fs-5">${data.invoice_no}</div>
+            ${cart.map(item => `<div class="d-flex justify-content-between small mb-1"><span>${escapeHtml(item.name)} × ${item.quantity}</span><span>${currencySymbol}${(item.price * item.quantity).toFixed(2)}</span></div>`).join('')}
+            <hr>
             <div class="d-flex justify-content-between fw-bold"><span>Total</span><span>${currencySymbol}${data.total.toFixed(2)}</span></div>
             <div class="d-flex justify-content-between small"><span>Paid</span><span>${currencySymbol}${paid.toFixed(2)}</span></div>
             <div class="d-flex justify-content-between small text-success"><span>Change</span><span>${currencySymbol}${data.change.toFixed(2)}</span></div>
-            <hr class="my-1">
-            <div class="d-flex gap-2 mt-2">
-                <button class="btn btn-sm btn-outline-primary flex-grow-1" onclick="window.print();return false;"><i class="bi bi-printer"></i> Print</button>
-                <button class="btn btn-sm btn-success flex-grow-1" onclick="resetPOS()"><i class="bi bi-plus-lg"></i> New Sale</button>
-            </div>
         `;
-        toast.classList.remove('d-none');
-        setTimeout(() => toast.classList.add('show'), 10);
+        overlay.classList.remove('d-none');
     } catch (err) {
         alert('Checkout failed: ' + err.message);
         completeSaleBtn.disabled = false;
@@ -419,8 +411,7 @@ function resetPOS() {
     paidAmount.value = '';
     changeRow.classList.add('d-none');
     document.getElementById('notes').value = '';
-    document.getElementById('receiptToast').classList.add('d-none');
-    document.getElementById('receiptToast').classList.remove('show');
+    document.getElementById('receiptOverlay').classList.add('d-none');
     renderCart();
 }
 
