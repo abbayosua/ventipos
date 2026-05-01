@@ -9,6 +9,14 @@ use App\Core\Session;
 
 class SettingController extends Controller
 {
+    protected array $currencySymbols = [
+        'USD' => '$', 'IDR' => 'Rp', 'EUR' => '€', 'GBP' => '£',
+        'JPY' => '¥', 'SGD' => 'S$', 'MYR' => 'RM', 'PHP' => '₱',
+        'THB' => '฿', 'VND' => '₫', 'CNY' => '¥', 'AUD' => 'A$',
+        'CAD' => 'C$', 'CHF' => 'Fr', 'KRW' => '₩', 'INR' => '₹',
+        'SAR' => '﷼', 'AED' => 'د.إ',
+    ];
+
     public function index(): void
     {
         $this->requireAuth();
@@ -18,6 +26,38 @@ class SettingController extends Controller
         $settings = Database::fetchAll("SELECT `key`, `value` FROM settings WHERE company_id = ?", [$this->companyId()]);
         $settingsMap = [];
         foreach ($settings as $s) $settingsMap[$s->key] = $s->value;
+
+        // Auto-fetch live exchange rates
+        $base = $company->currency_code ?? 'USD';
+        try {
+            $json = @file_get_contents("https://api.frankfurter.app/latest?from={$base}");
+            if ($json) {
+                $data = json_decode($json);
+                if ($data && isset($data->rates)) {
+                    Database::update('currency_rates', ['rate' => 1.000000], 'company_id = ? AND is_base = 1', [$this->companyId()]);
+                    foreach ($data->rates as $code => $rate) {
+                        $symbol = $this->currencySymbols[$code] ?? '';
+                        $existing = Database::fetch(
+                            "SELECT id FROM currency_rates WHERE company_id = ? AND code = ?",
+                            [$this->companyId(), $code]
+                        );
+                        if ($existing) {
+                            Database::update('currency_rates', ['rate' => $rate, 'symbol' => $symbol], 'id = ?', [$existing->id]);
+                        } else {
+                            Database::insert('currency_rates', [
+                                'company_id' => $this->companyId(),
+                                'code' => $code,
+                                'symbol' => $symbol,
+                                'rate' => $rate,
+                                'is_base' => 0,
+                            ]);
+                        }
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            // Silently fail - rates just won't update
+        }
 
         $this->render('settings.index', [
             'title' => 'Settings',
@@ -185,18 +225,19 @@ class SettingController extends Controller
             Database::update('currency_rates', ['rate' => 1.000000], 'company_id = ? AND is_base = 1', [$this->companyId()]);
 
             foreach ($data->rates as $code => $rate) {
+                $symbol = $this->currencySymbols[$code] ?? '';
                 $existing = Database::fetch(
                     "SELECT id FROM currency_rates WHERE company_id = ? AND code = ?",
                     [$this->companyId(), $code]
                 );
 
                 if ($existing) {
-                    Database::update('currency_rates', ['rate' => $rate], 'id = ?', [$existing->id]);
+                    Database::update('currency_rates', ['rate' => $rate, 'symbol' => $symbol], 'id = ?', [$existing->id]);
                 } else {
                     Database::insert('currency_rates', [
                         'company_id' => $this->companyId(),
                         'code' => $code,
-                        'symbol' => '',
+                        'symbol' => $symbol,
                         'rate' => $rate,
                         'is_base' => 0,
                     ]);
