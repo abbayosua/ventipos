@@ -27,13 +27,39 @@
                     <label class="form-label"><?= __('common.phone') ?></label>
                     <input type="text" name="phone" class="form-control" value="<?= e($company->phone) ?>">
                 </div>
-                <div class="col-md-3 mb-3">
+                <div class="col-md-6 mb-3">
                     <label class="form-label"><?= __('settings.currency_code') ?></label>
-                    <input type="text" name="currency_code" class="form-control" value="<?= e($company->currency_code) ?>">
-                </div>
-                <div class="col-md-3 mb-3">
-                    <label class="form-label"><?= __('settings.currency_symbol') ?></label>
-                    <input type="text" name="currency_symbol" class="form-control" value="<?= e($company->currency_symbol) ?>">
+                    <select name="currency_code" class="form-select" onchange="updateCurrencySymbol(this)">
+                        <?php
+                        $currencies = [
+                            'USD' => ['$', 'US Dollar'],
+                            'IDR' => ['Rp', 'Indonesian Rupiah'],
+                            'EUR' => ['€', 'Euro'],
+                            'GBP' => ['£', 'British Pound'],
+                            'JPY' => ['¥', 'Japanese Yen'],
+                            'SGD' => ['S$', 'Singapore Dollar'],
+                            'MYR' => ['RM', 'Malaysian Ringgit'],
+                            'PHP' => ['₱', 'Philippine Peso'],
+                            'THB' => ['฿', 'Thai Baht'],
+                            'VND' => ['₫', 'Vietnamese Dong'],
+                            'CNY' => ['¥', 'Chinese Yuan'],
+                            'AUD' => ['A$', 'Australian Dollar'],
+                            'CAD' => ['C$', 'Canadian Dollar'],
+                            'CHF' => ['Fr', 'Swiss Franc'],
+                            'KRW' => ['₩', 'South Korean Won'],
+                            'INR' => ['₹', 'Indian Rupee'],
+                            'SAR' => ['﷼', 'Saudi Riyal'],
+                            'AED' => ['د.إ', 'UAE Dirham'],
+                        ];
+                        ?>
+                        <?php foreach ($currencies as $code => $meta): ?>
+                            <option value="<?= $code ?>" data-symbol="<?= $meta[0] ?>"
+                                <?= $company->currency_code === $code ? 'selected' : '' ?>>
+                                <?= $code ?> — <?= $meta[0] ?> (<?= $meta[1] ?>)
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <input type="hidden" name="currency_symbol" id="currencySymbol" value="<?= e($company->currency_symbol) ?>">
                 </div>
             </div>
             <div class="mb-3">
@@ -46,7 +72,15 @@
 </div>
 
 <div class="card mt-3">
-    <div class="card-header"><?= __('settings.currency_rates') ?></div>
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span><?= __('settings.currency_rates') ?></span>
+        <form method="POST" action="<?= baseUrl('settings/fetch-rates') ?>" class="d-inline">
+            <?= csrfField() ?>
+            <button type="submit" class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-cloud-download"></i> Fetch Live Rates
+            </button>
+        </form>
+    </div>
     <div class="card-body">
         <table class="table table-sm mb-0">
             <thead><tr><th><?= __('settings.currency_code') ?></th><th><?= __('settings.currency_symbol') ?></th><th><?= __('common.amount') ?> (vs base)</th><th><?= __('common.status') ?></th></tr></thead>
@@ -62,10 +96,17 @@
                     <td><?= e($r->code) ?></td>
                     <td><?= e($r->symbol) ?></td>
                     <td><?= $r->rate ?></td>
-                    <td><?= $r->is_base ? '✓' : '' ?></td>
+                    <td><?= $r->is_base ? '✓ Base' : '' ?></td>
                 </tr>
                 <?php endforeach; ?>
             </tbody>
         </table>
     </div>
 </div>
+
+<script>
+function updateCurrencySymbol(select) {
+    const opt = select.options[select.selectedIndex];
+    document.getElementById('currencySymbol').value = opt.dataset.symbol;
+}
+</script>

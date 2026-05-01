@@ -164,4 +164,50 @@ class SettingController extends Controller
         flash('success', 'User invited.');
         $this->redirect('/settings/users');
     }
+
+    public function fetchRates(): void
+    {
+        $this->requireAuth();
+        $this->requireCompany();
+
+        $company = Database::fetch("SELECT currency_code FROM companies WHERE id = ?", [$this->companyId()]);
+        $base = $company->currency_code ?? 'USD';
+
+        try {
+            $json = file_get_contents("https://api.frankfurter.app/latest?from={$base}");
+            $data = json_decode($json);
+
+            if (!$data || !isset($data->rates)) {
+                flash('error', 'Failed to fetch rates from API.');
+                $this->redirect('/settings');
+            }
+
+            Database::update('currency_rates', ['rate' => 1.000000], 'company_id = ? AND is_base = 1', [$this->companyId()]);
+
+            foreach ($data->rates as $code => $rate) {
+                $existing = Database::fetch(
+                    "SELECT id FROM currency_rates WHERE company_id = ? AND code = ?",
+                    [$this->companyId(), $code]
+                );
+
+                if ($existing) {
+                    Database::update('currency_rates', ['rate' => $rate], 'id = ?', [$existing->id]);
+                } else {
+                    Database::insert('currency_rates', [
+                        'company_id' => $this->companyId(),
+                        'code' => $code,
+                        'symbol' => '',
+                        'rate' => $rate,
+                        'is_base' => 0,
+                    ]);
+                }
+            }
+
+            flash('success', 'Live exchange rates updated (' . count((array)$data->rates) . ' currencies).');
+        } catch (\Throwable $e) {
+            flash('error', 'API error: ' . $e->getMessage());
+        }
+
+        $this->redirect('/settings');
+    }
 }

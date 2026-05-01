@@ -93,6 +93,7 @@ class App
         $this->router->post('/settings/switch-outlet', 'SettingController@switchOutlet');
         $this->router->get('/settings/users', 'SettingController@users');
         $this->router->post('/settings/users/invite', 'SettingController@userInvite');
+        $this->router->post('/settings/fetch-rates', 'SettingController@fetchRates');
     }
 
     public function run(): void
