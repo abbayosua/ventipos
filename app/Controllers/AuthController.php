@@ -45,6 +45,7 @@ class AuthController extends Controller
             Session::set('company_id', $company->id);
             Session::set('company_name', $company->name);
             Session::set('currency_symbol', $company->currency_symbol);
+            Session::set('base_currency', $company->base_currency ?? 'IDR');
             Session::set('role', $company->role);
 
             $outlet = Database::fetch(
@@ -54,6 +55,9 @@ class AuthController extends Controller
             if ($outlet) {
                 Session::set('outlet_id', $outlet->id);
                 Session::set('outlet_name', $outlet->name);
+                Session::set('display_currency', $outlet->display_currency ?? 'IDR');
+            } else {
+                Session::set('display_currency', 'IDR');
             }
         }
 
@@ -93,8 +97,10 @@ class AuthController extends Controller
             $companyId = Database::insert('companies', [
                 'name' => $companyName,
                 'email' => $email,
-                'currency_code' => 'USD',
-                'currency_symbol' => '$',
+                'currency_code' => 'IDR',
+                'currency_symbol' => 'Rp',
+                'base_currency' => 'IDR',
+                'display_currency' => 'IDR',
             ]);
 
             Database::insert('company_user', [
@@ -111,8 +117,8 @@ class AuthController extends Controller
 
             Database::insert('currency_rates', [
                 'company_id' => $companyId,
-                'code' => 'USD',
-                'symbol' => '$',
+                'code' => 'IDR',
+                'symbol' => 'Rp',
                 'rate' => 1.000000,
                 'is_base' => 1,
             ]);

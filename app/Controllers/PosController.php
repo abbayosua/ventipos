@@ -32,13 +32,12 @@ class PosController extends Controller
             [$outletId, $companyId]
         );
 
+        foreach ($products as $p) {
+            $p->selling_price = $this->toDisplayCurrency((float)$p->selling_price);
+        }
+
         $customers = Database::fetchAll(
             "SELECT id, name, phone FROM customers WHERE company_id = ? AND is_active = 1 ORDER BY name",
-            [$companyId]
-        );
-
-        $currency = Database::fetch(
-            "SELECT currency_symbol FROM companies WHERE id = ?",
             [$companyId]
         );
 
@@ -47,7 +46,7 @@ class PosController extends Controller
             'categories' => $categories,
             'products' => $products,
             'customers' => $customers,
-            'currencySymbol' => $currency->currency_symbol ?? '$',
+            'currencySymbol' => $this->displayCurrencySymbol(),
         ], 'pos');
     }
 
@@ -81,6 +80,9 @@ class PosController extends Controller
         $sql .= " ORDER BY p.name LIMIT 50";
 
         $products = Database::fetchAll($sql, $params);
+        foreach ($products as $p) {
+            $p->selling_price = $this->toDisplayCurrency((float)$p->selling_price);
+        }
         $this->json($products);
     }
 
@@ -114,10 +116,10 @@ class PosController extends Controller
         $userId = $this->userId();
         $items = json_decode(Request::post('items', '[]'), true);
         $paymentMethod = Request::post('payment_method', 'cash');
-        $paidAmount = (float) (Request::post('paid_amount', 0));
+        $paidAmount = $this->toBaseCurrency((float) (Request::post('paid_amount', 0)));
         $customerId = Request::post('customer_id') ?: null;
         $discountType = Request::post('discount_type') ?: null;
-        $discountValue = (float) (Request::post('discount_value', 0));
+        $discountValue = $this->toBaseCurrency((float) (Request::post('discount_value', 0)));
         $notes = Request::post('notes');
 
         if (empty($items)) {

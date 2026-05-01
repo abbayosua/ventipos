@@ -80,8 +80,8 @@ class ProductController extends Controller
         $sku = Request::post('sku');
         $barcode = Request::post('barcode');
         $categoryId = Request::post('category_id');
-        $costPrice = (float) (Request::post('cost_price') ?? 0);
-        $sellingPrice = (float) (Request::post('selling_price') ?? 0);
+        $costPrice = $this->toBaseCurrency((float) (Request::post('cost_price') ?? 0));
+        $sellingPrice = $this->toBaseCurrency((float) (Request::post('selling_price') ?? 0));
         $taxRate = (float) (Request::post('tax_rate') ?? 0);
         $unit = Request::post('unit') ?: 'pcs';
         $description = Request::post('description');
@@ -181,8 +181,8 @@ class ProductController extends Controller
             'sku' => Request::post('sku'),
             'barcode' => Request::post('barcode'),
             'description' => Request::post('description'),
-            'cost_price' => (float) (Request::post('cost_price') ?? 0),
-            'selling_price' => (float) (Request::post('selling_price') ?? 0),
+            'cost_price' => $this->toBaseCurrency((float) (Request::post('cost_price') ?? 0)),
+            'selling_price' => $this->toBaseCurrency((float) (Request::post('selling_price') ?? 0)),
             'tax_rate' => (float) (Request::post('tax_rate') ?? 0),
             'unit' => Request::post('unit') ?: 'pcs',
         ], 'id = ?', [$id]);

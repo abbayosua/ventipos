@@ -61,4 +61,46 @@ abstract class Controller
     {
         return Session::get('role', 'cashier');
     }
+
+    protected function toBaseCurrency(float $amount): float
+    {
+        $base = Session::get('base_currency', 'IDR');
+        $display = Session::get('display_currency', 'IDR');
+        if ($base === $display) return $amount;
+
+        $rate = Database::fetch(
+            "SELECT rate FROM currency_rates WHERE company_id = ? AND code = ?",
+            [$this->companyId(), $display]
+        );
+        if ($rate && (float)$rate->rate > 0) {
+            return $amount / (float)$rate->rate;
+        }
+        return $amount;
+    }
+
+    protected function toDisplayCurrency(float $amount): float
+    {
+        $base = Session::get('base_currency', 'IDR');
+        $display = Session::get('display_currency', 'IDR');
+        if ($base === $display || !$display) return $amount;
+
+        $rate = Database::fetch(
+            "SELECT rate FROM currency_rates WHERE company_id = ? AND code = ?",
+            [$this->companyId(), $display]
+        );
+        if ($rate && (float)$rate->rate > 0) {
+            return $amount * (float)$rate->rate;
+        }
+        return $amount;
+    }
+
+    protected function displayCurrencySymbol(): string
+    {
+        $display = Session::get('display_currency', 'IDR');
+        $rate = Database::fetch(
+            "SELECT symbol FROM currency_rates WHERE company_id = ? AND code = ?",
+            [$this->companyId(), $display]
+        );
+        return $rate->symbol ?? ($display === 'IDR' ? 'Rp' : '$');
+    }
 }

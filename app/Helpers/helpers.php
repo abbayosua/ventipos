@@ -31,12 +31,32 @@ if (!function_exists('flash')) {
 }
 
 if (!function_exists('formatMoney')) {
-    function formatMoney(float $amount, ?string $symbol = null): string
+    function formatMoney(float $amount, ?string $to = null): string
     {
-        if ($symbol === null) {
-            $symbol = \App\Core\Session::get('currency_symbol', '$');
+        static $cache = [];
+        $to = $to ?? \App\Core\Session::get('display_currency', 'IDR');
+
+        if (!isset($cache[$to])) {
+            $companyId = \App\Core\Session::get('company_id');
+            $base = \App\Core\Session::get('base_currency', 'IDR');
+
+            if ($to === $base) {
+                $cache[$to] = ['rate' => 1, 'symbol' => \App\Core\Session::get('currency_symbol', 'Rp')];
+            } else {
+                $rate = \App\Core\Database::fetch(
+                    "SELECT rate, symbol FROM currency_rates WHERE company_id = ? AND code = ?",
+                    [$companyId, $to]
+                );
+                if ($rate) {
+                    $cache[$to] = ['rate' => (float)$rate->rate, 'symbol' => $rate->symbol ?: $to];
+                } else {
+                    $cache[$to] = ['rate' => 1, 'symbol' => $to];
+                }
+            }
         }
-        return $symbol . number_format($amount, 2);
+
+        $converted = $amount * $cache[$to]['rate'];
+        return $cache[$to]['symbol'] . number_format($converted, 2);
     }
 }
 

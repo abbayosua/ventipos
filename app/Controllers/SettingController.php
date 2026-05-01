@@ -76,13 +76,10 @@ class SettingController extends Controller
             'email' => Request::post('email'),
             'phone' => Request::post('phone'),
             'address' => Request::post('address'),
-            'currency_code' => Request::post('currency_code', 'USD'),
-            'currency_symbol' => Request::post('currency_symbol', '$'),
             'timezone' => Request::post('timezone', 'UTC'),
         ], 'id = ?', [$this->companyId()]);
 
         Session::set('company_name', Request::post('name'));
-        Session::set('currency_symbol', Request::post('currency_symbol', '$'));
 
         flash('success', 'Settings updated.');
         $this->redirect('/settings');
@@ -110,6 +107,7 @@ class SettingController extends Controller
             'company_id' => $this->companyId(),
             'name' => Request::post('name'),
             'code' => Request::post('code'),
+            'display_currency' => Request::post('display_currency', 'IDR'),
             'address' => Request::post('address'),
             'phone' => Request::post('phone'),
             'email' => Request::post('email'),
@@ -147,6 +145,7 @@ class SettingController extends Controller
         if ($outlet) {
             Session::set('outlet_id', $outlet->id);
             Session::set('outlet_name', $outlet->name);
+            Session::set('display_currency', $outlet->display_currency ?? 'IDR');
         }
 
         $this->redirect('/dashboard');

@@ -29,37 +29,10 @@
                 </div>
                 <div class="col-md-6 mb-3">
                     <label class="form-label"><?= __('settings.currency_code') ?></label>
-                    <select name="currency_code" class="form-select" onchange="updateCurrencySymbol(this)">
-                        <?php
-                        $currencies = [
-                            'USD' => ['$', 'US Dollar'],
-                            'IDR' => ['Rp', 'Indonesian Rupiah'],
-                            'EUR' => ['€', 'Euro'],
-                            'GBP' => ['£', 'British Pound'],
-                            'JPY' => ['¥', 'Japanese Yen'],
-                            'SGD' => ['S$', 'Singapore Dollar'],
-                            'MYR' => ['RM', 'Malaysian Ringgit'],
-                            'PHP' => ['₱', 'Philippine Peso'],
-                            'THB' => ['฿', 'Thai Baht'],
-                            'VND' => ['₫', 'Vietnamese Dong'],
-                            'CNY' => ['¥', 'Chinese Yuan'],
-                            'AUD' => ['A$', 'Australian Dollar'],
-                            'CAD' => ['C$', 'Canadian Dollar'],
-                            'CHF' => ['Fr', 'Swiss Franc'],
-                            'KRW' => ['₩', 'South Korean Won'],
-                            'INR' => ['₹', 'Indian Rupee'],
-                            'SAR' => ['﷼', 'Saudi Riyal'],
-                            'AED' => ['د.إ', 'UAE Dirham'],
-                        ];
-                        ?>
-                        <?php foreach ($currencies as $code => $meta): ?>
-                            <option value="<?= $code ?>" data-symbol="<?= $meta[0] ?>"
-                                <?= $company->currency_code === $code ? 'selected' : '' ?>>
-                                <?= $code ?> — <?= $meta[0] ?> (<?= $meta[1] ?>)
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                    <input type="hidden" name="currency_symbol" id="currencySymbol" value="<?= e($company->currency_symbol) ?>">
+                    <div>
+                        <strong class="form-control-plaintext"><?= e($company->base_currency) ?></strong>
+                        <small class="text-muted d-block">Base currency (set during registration, cannot be changed)</small>
+                    </div>
                 </div>
             </div>
             <div class="mb-3">
@@ -104,9 +77,4 @@
     </div>
 </div>
 
-<script>
-function updateCurrencySymbol(select) {
-    const opt = select.options[select.selectedIndex];
-    document.getElementById('currencySymbol').value = opt.dataset.symbol;
-}
-</script>
+

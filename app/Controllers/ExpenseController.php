@@ -59,7 +59,7 @@ class ExpenseController extends Controller
         Database::insert('expenses', [
             'outlet_id' => $this->outletId(),
             'category' => Request::post('category'),
-            'amount' => (float) (Request::post('amount', 0)),
+            'amount' => $this->toBaseCurrency((float) (Request::post('amount', 0))),
             'description' => Request::post('description'),
             'expense_date' => Request::post('expense_date', date('Y-m-d')),
             'created_by' => $this->userId(),

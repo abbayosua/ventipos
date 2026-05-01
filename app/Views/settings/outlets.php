@@ -24,6 +24,17 @@
                         <input type="text" name="code" class="form-control" placeholder="e.g. STORE-01">
                     </div>
                     <div class="mb-3">
+                        <label class="form-label"><?= __('settings.currency_code') ?></label>
+                        <select name="display_currency" class="form-select">
+                            <?php $currencies = ['USD'=>'$','IDR'=>'Rp','EUR'=>'€','GBP'=>'£','SGD'=>'S$','MYR'=>'RM']; ?>
+                            <?php foreach ($currencies as $code => $sym): ?>
+                                <option value="<?= $code ?>" <?= $code === 'IDR' ? 'selected' : '' ?>>
+                                    <?= $code ?> (<?= $sym ?>)
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="mb-3">
                         <label class="form-label"><?= __('common.phone') ?></label>
                         <input type="text" name="phone" class="form-control">
                     </div>
@@ -44,12 +55,13 @@
         <div class="card">
             <div class="card-body p-0">
                 <table class="table table-hover mb-0">
-                    <thead><tr><th><?= __('common.name') ?></th><th><?= __('common.code') ?></th><th><?= __('common.phone') ?></th><th class="text-end"><?= __('common.actions') ?></th></tr></thead>
+                    <thead><tr><th><?= __('common.name') ?></th><th><?= __('common.code') ?></th><th><?= __('settings.currency_code') ?></th><th><?= __('common.phone') ?></th><th class="text-end"><?= __('common.actions') ?></th></tr></thead>
                     <tbody>
                         <?php foreach ($outlets as $o): ?>
                         <tr>
                             <td class="fw-medium"><?= e($o->name) ?></td>
                             <td><?= e($o->code) ?></td>
+                            <td><?= e($o->display_currency ?? 'IDR') ?></td>
                             <td><?= e($o->phone ?? '-') ?></td>
                             <td class="text-end">
                                 <form method="POST" action="<?= baseUrl('settings/switch-outlet') ?>" class="d-inline">

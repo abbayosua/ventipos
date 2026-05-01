@@ -53,8 +53,10 @@ $companyId = Database::insert('companies', [
     'email' => 'info@democompany.com',
     'phone' => '555-0100',
     'address' => '123 Main Street, Downtown',
-    'currency_code' => 'USD',
-    'currency_symbol' => '$',
+    'currency_code' => 'IDR',
+    'currency_symbol' => 'Rp',
+    'base_currency' => 'IDR',
+    'display_currency' => 'IDR',
     'timezone' => 'UTC',
 ]);
 
@@ -78,14 +80,14 @@ foreach (['Alice Cashier', 'Bob Cashier'] as $i => $name) {
 }
 
 // Outlets
-$outletMainId = Database::insert('outlets', ['company_id' => $companyId, 'name' => 'Main Store', 'code' => 'MAIN', 'address' => '123 Main Street', 'phone' => '555-0101']);
-$outletBranchId = Database::insert('outlets', ['company_id' => $companyId, 'name' => 'Branch Store', 'code' => 'BRANCH', 'address' => '456 Oak Avenue', 'phone' => '555-0102']);
+$outletMainId = Database::insert('outlets', ['company_id' => $companyId, 'name' => 'Main Store', 'code' => 'MAIN', 'display_currency' => 'IDR', 'address' => '123 Main Street', 'phone' => '555-0101']);
+$outletBranchId = Database::insert('outlets', ['company_id' => $companyId, 'name' => 'Branch Store', 'code' => 'BRANCH', 'display_currency' => 'IDR', 'address' => '456 Oak Avenue', 'phone' => '555-0102']);
 $outlets = [$outletMainId, $outletBranchId];
 
 // Currency rates
-Database::insert('currency_rates', ['company_id' => $companyId, 'code' => 'USD', 'symbol' => '$', 'rate' => 1.000000, 'is_base' => 1]);
-Database::insert('currency_rates', ['company_id' => $companyId, 'code' => 'EUR', 'symbol' => '€', 'rate' => 0.920000, 'is_base' => 0]);
-Database::insert('currency_rates', ['company_id' => $companyId, 'code' => 'GBP', 'symbol' => '£', 'rate' => 0.790000, 'is_base' => 0]);
+Database::insert('currency_rates', ['company_id' => $companyId, 'code' => 'IDR', 'symbol' => 'Rp', 'rate' => 1.000000, 'is_base' => 1]);
+Database::insert('currency_rates', ['company_id' => $companyId, 'code' => 'USD', 'symbol' => '$', 'rate' => 0.000062, 'is_base' => 0]);
+Database::insert('currency_rates', ['company_id' => $companyId, 'code' => 'EUR', 'symbol' => '€', 'rate' => 0.000057, 'is_base' => 0]);
 
 echo "Creating categories...\n";
 $categories = [];

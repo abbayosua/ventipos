@@ -141,17 +141,17 @@ PHP;
                     $stmt->execute([$name, $email, password_hash($password, PASSWORD_DEFAULT)]);
                     $userId = $pdo->lastInsertId();
 
-                    $stmt = $pdo->prepare("INSERT INTO companies (name, email, currency_code, currency_symbol) VALUES (?, ?, 'USD', '\$')");
+                    $stmt = $pdo->prepare("INSERT INTO companies (name, email, currency_code, currency_symbol, base_currency, display_currency) VALUES (?, ?, 'IDR', 'Rp', 'IDR', 'IDR')");
                     $stmt->execute([$companyName, $email]);
                     $companyId = $pdo->lastInsertId();
 
                     $stmt = $pdo->prepare("INSERT INTO company_user (company_id, user_id, role) VALUES (?, ?, 'owner')");
                     $stmt->execute([$companyId, $userId]);
 
-                    $stmt = $pdo->prepare("INSERT INTO outlets (company_id, name, code) VALUES (?, 'Main Store', 'MAIN')");
+                    $stmt = $pdo->prepare("INSERT INTO outlets (company_id, name, code, display_currency) VALUES (?, 'Main Store', 'MAIN', 'IDR')");
                     $stmt->execute([$companyId]);
 
-                    $stmt = $pdo->prepare("INSERT INTO currency_rates (company_id, code, symbol, rate, is_base) VALUES (?, 'USD', '\$', 1.000000, 1)");
+                    $stmt = $pdo->prepare("INSERT INTO currency_rates (company_id, code, symbol, rate, is_base) VALUES (?, 'IDR', 'Rp', 1.000000, 1)");
                     $stmt->execute([$companyId]);
 
                     $pdo->commit();
@@ -256,7 +256,7 @@ PHP;
                     }
 
                     // EUR currency
-                    $pdo->prepare("INSERT INTO currency_rates (company_id, code, symbol, rate, is_base) VALUES (?, 'EUR', '€', 0.920000, 0)")
+                    $pdo->prepare("INSERT INTO currency_rates (company_id, code, symbol, rate, is_base) VALUES (?, 'EUR', '€', 0.000057, 0)")
                         ->execute([$companyId]);
 
                     $success = ' Demo data seeded successfully!';
