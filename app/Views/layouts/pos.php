@@ -38,6 +38,7 @@
     <?= $content ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/dist/html5-qrcode.min.js"></script>
     <script src="<?= assetUrl('js/pos.js') ?>"></script>
 </body>
 </html>

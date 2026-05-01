@@ -18,7 +18,16 @@
                 </div>
                 <div class="col-md-3 mb-3">
                     <label class="form-label"><?= __('products.barcode') ?></label>
-                    <input type="text" name="barcode" class="form-control" value="<?= e($product->barcode ?? old('barcode')) ?>">
+                    <div class="input-group">
+                        <input type="text" name="barcode" id="productBarcode" class="form-control"
+                               value="<?= e($product->barcode ?? old('barcode')) ?>">
+                        <button class="btn btn-outline-secondary" type="button" onclick="openBarcodeScanner('product')" title="Scan with camera">
+                            <i class="bi bi-camera"></i>
+                        </button>
+                        <button class="btn btn-outline-info" type="button" onclick="lookupBarcode()" title="Lookup product info">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -62,5 +71,22 @@
 
             <button type="submit" class="btn btn-primary"><?= $product ? __('common.update') : __('common.create') ?></button>
         </form>
+    </div>
+</div>
+
+<!-- Barcode Scanner Modal -->
+<div id="scannerOverlay" class="scanner-overlay d-none">
+    <div class="scanner-modal">
+        <div class="scanner-modal-header">
+            <span>Barcode Scanner</span>
+            <button type="button" class="btn-close btn-close-white" onclick="closeBarcodeScanner()"></button>
+        </div>
+        <div class="scanner-modal-body">
+            <div id="scannerContainer"></div>
+            <div id="scannerResult" class="scanner-result d-none"></div>
+        </div>
+        <div class="scanner-modal-footer">
+            <button class="btn btn-secondary btn-sm w-100" onclick="closeBarcodeScanner()">Cancel</button>
+        </div>
     </div>
 </div>

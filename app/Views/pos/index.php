@@ -19,11 +19,16 @@ $currencySymbol = e($currencySymbol);
                     <?php endforeach; ?>
                 </select>
             </div>
-            <div class="col-md-2">
-                <input type="text" id="posBarcode" class="form-control form-control-sm"
-                       placeholder="<?= __('pos.scan_barcode') ?>">
+            <div class="col-md-3">
+                <div class="input-group input-group-sm">
+                    <input type="text" id="posBarcode" class="form-control"
+                           placeholder="<?= __('pos.scan_barcode') ?>">
+                    <button class="btn btn-outline-secondary" type="button" onclick="openBarcodeScanner('pos')" title="Scan with camera">
+                        <i class="bi bi-camera"></i>
+                    </button>
+                </div>
             </div>
-            <div class="col-md-2">
+            <div class="col-md-1">
                 <button class="btn btn-sm btn-outline-secondary w-100" onclick="clearFilters()"><?= __('common.clear') ?></button>
             </div>
         </div>
@@ -161,6 +166,23 @@ $currencySymbol = e($currencySymbol);
                     <i class="bi bi-trash"></i> <?= __('pos.clear_cart') ?>
                 </button>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Barcode Scanner Modal -->
+<div id="scannerOverlay" class="scanner-overlay d-none">
+    <div class="scanner-modal">
+        <div class="scanner-modal-header">
+            <span>Barcode Scanner</span>
+            <button type="button" class="btn-close btn-close-white" onclick="closeBarcodeScanner()"></button>
+        </div>
+        <div class="scanner-modal-body">
+            <div id="scannerContainer"></div>
+            <div id="scannerResult" class="scanner-result d-none"></div>
+        </div>
+        <div class="scanner-modal-footer">
+            <button class="btn btn-secondary btn-sm w-100" onclick="closeBarcodeScanner()">Cancel</button>
         </div>
     </div>
 </div>

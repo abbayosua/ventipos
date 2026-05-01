@@ -32,16 +32,7 @@ document.addEventListener('DOMContentLoaded', function () {
         barcodeInput.addEventListener('keydown', function (e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
-                const barcode = this.value.trim();
-                if (barcode) {
-                    const product = products.find(p => p.barcode === barcode);
-                    if (product) {
-                        addToCart(product.id);
-                        this.value = '';
-                    } else {
-                        alert('Product not found: ' + barcode);
-                    }
-                }
+                handleBarcode(this.value.trim());
             }
         });
     }
@@ -459,6 +450,89 @@ function resetPOS() {
     document.getElementById('notes').value = '';
     document.getElementById('receiptOverlay').classList.add('d-none');
     renderCart();
+}
+
+function handleBarcode(barcode) {
+    if (!barcode) return;
+    const product = products.find(p => p.barcode === barcode);
+    if (product) {
+        addToCart(product.id);
+        barcodeInput.value = '';
+    } else {
+        // Try Open Food Facts
+        lookupBarcodeAPI(barcode, function (name) {
+            if (name) {
+                if (confirm(`Barcode: ${barcode}\nProduct: ${name}\n\nNot in your catalog. Add it now?`)) {
+                    window.location.href = baseUrl + 'products/create?barcode=' + encodeURIComponent(barcode) + '&name=' + encodeURIComponent(name);
+                }
+            } else {
+                alert('Product not found: ' + barcode);
+            }
+        });
+    }
+}
+
+function lookupBarcodeAPI(barcode, callback) {
+    fetch('https://world.openfoodfacts.org/api/v0/product/' + barcode + '.json')
+        .then(r => r.json())
+        .then(data => {
+            if (data.status === 1 && data.product) {
+                callback(data.product.product_name || '');
+            } else {
+                callback('');
+            }
+        })
+        .catch(() => callback(''));
+}
+
+// --- Barcode Camera Scanner ---
+let html5Scanner = null;
+let scannerMode = '';
+
+function openBarcodeScanner(mode) {
+    scannerMode = mode;
+    const overlay = document.getElementById('scannerOverlay');
+    const container = document.getElementById('scannerContainer');
+    const result = document.getElementById('scannerResult');
+    overlay.classList.remove('d-none');
+    result.classList.add('d-none');
+    container.innerHTML = '';
+
+    Html5Qrcode.getCameras().then(function (cameras) {
+        if (cameras.length === 0) { alert('No camera found.'); return; }
+        const cameraId = cameras[cameras.length - 1].id; // prefer rear camera
+        html5Scanner = new Html5Qrcode('scannerContainer');
+        html5Scanner.start(
+            cameraId,
+            { fps: 10, qrbox: { width: 250, height: 150 } },
+            function (decodedText) {
+                closeBarcodeScanner();
+                if (scannerMode === 'pos') {
+                    handleBarcode(decodedText);
+                } else if (scannerMode === 'product') {
+                    document.getElementById('productBarcode').value = decodedText;
+                    lookupBarcode();
+                }
+            },
+            function () { /* keep scanning */ }
+        ).catch(function (err) {
+            alert('Camera error: ' + err);
+            closeBarcodeScanner();
+        });
+    }).catch(function (err) {
+        alert('Camera access denied: ' + err);
+        closeBarcodeScanner();
+    });
+}
+
+function closeBarcodeScanner() {
+    if (html5Scanner) {
+        html5Scanner.stop().then(function () {
+            html5Scanner.clear();
+            html5Scanner = null;
+        }).catch(function () {});
+    }
+    document.getElementById('scannerOverlay').classList.add('d-none');
 }
 
 function debounce(fn, delay) {
