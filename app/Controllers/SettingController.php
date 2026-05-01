@@ -82,6 +82,7 @@ class SettingController extends Controller
         ], 'id = ?', [$this->companyId()]);
 
         Session::set('company_name', Request::post('name'));
+        Session::set('currency_symbol', Request::post('currency_symbol', '$'));
 
         flash('success', 'Settings updated.');
         $this->redirect('/settings');

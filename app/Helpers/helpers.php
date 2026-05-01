@@ -31,8 +31,11 @@ if (!function_exists('flash')) {
 }
 
 if (!function_exists('formatMoney')) {
-    function formatMoney(float $amount, string $symbol = '$'): string
+    function formatMoney(float $amount, ?string $symbol = null): string
     {
+        if ($symbol === null) {
+            $symbol = \App\Core\Session::get('currency_symbol', '$');
+        }
         return $symbol . number_format($amount, 2);
     }
 }

@@ -44,6 +44,7 @@ class AuthController extends Controller
         if ($company) {
             Session::set('company_id', $company->id);
             Session::set('company_name', $company->name);
+            Session::set('currency_symbol', $company->currency_symbol);
             Session::set('role', $company->role);
 
             $outlet = Database::fetch(
