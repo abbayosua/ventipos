@@ -2,20 +2,20 @@
     <div class="col-md-4">
         <div class="card shadow">
             <div class="card-body p-4">
-                <h4 class="text-center mb-4">Login to <?= e(config('app.name')) ?></h4>
+                <h4 class="text-center mb-4"><?= __('auth.login_title', ['app' => config('app.name')]) ?></h4>
                 <form method="POST" action="<?= baseUrl('login') ?>">
                     <?= csrfField() ?>
                     <div class="mb-3">
-                        <label class="form-label">Email</label>
+                        <label class="form-label"><?= __('auth.email') ?></label>
                         <input type="email" name="email" class="form-control" required autofocus>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Password</label>
+                        <label class="form-label"><?= __('auth.password') ?></label>
                         <input type="password" name="password" class="form-control" required>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100">Login</button>
+                    <button type="submit" class="btn btn-primary w-100"><?= __('auth.login') ?></button>
                     <p class="text-center mt-3 mb-0">
-                        <a href="<?= baseUrl('register') ?>">Create Account</a>
+                        <a href="<?= baseUrl('register') ?>"><?= __('auth.no_account') ?></a>
                     </p>
                 </form>
             </div>

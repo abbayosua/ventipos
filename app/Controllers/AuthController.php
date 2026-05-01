@@ -132,4 +132,15 @@ class AuthController extends Controller
         Session::destroy();
         $this->redirect('/login');
     }
+
+    public function switchLang(string $locale): void
+    {
+        $available = array_keys(\App\Lang\Lang::available());
+        if (in_array($locale, $available)) {
+            Session::set('lang', $locale);
+            \App\Lang\Lang::setLocale($locale);
+        }
+        $referer = $_SERVER['HTTP_REFERER'] ?? '/dashboard';
+        $this->redirect($referer);
+    }
 }

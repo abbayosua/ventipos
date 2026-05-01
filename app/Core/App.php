@@ -2,6 +2,8 @@
 
 namespace App\Core;
 
+use App\Lang\Lang;
+
 class App
 {
     protected array $config;
@@ -13,6 +15,7 @@ class App
         $this->router = new Router();
 
         Session::start($config['session']['lifetime'] ?? 86400);
+        Lang::init(Session::get('lang', 'id'));
         Database::init($config['database']);
         Request::init();
 
@@ -27,6 +30,8 @@ class App
         $this->router->get('/logout', 'AuthController@logout');
         $this->router->get('/register', 'AuthController@registerForm');
         $this->router->post('/register', 'AuthController@register');
+
+        $this->router->get('/lang/{locale}', 'AuthController@switchLang');
 
         $this->router->get('/dashboard', 'DashboardController@index');
 

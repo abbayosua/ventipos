@@ -73,6 +73,13 @@ if (!function_exists('e')) {
     }
 }
 
+if (!function_exists('__')) {
+    function __(string $key, array $replace = []): string
+    {
+        return \App\Lang\Lang::get($key, $replace);
+    }
+}
+
 if (!function_exists('config')) {
     function config(string $key, mixed $default = null): mixed
     {

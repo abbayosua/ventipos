@@ -296,7 +296,7 @@ function updateChange() {
             changeDisplay.classList.add('text-success');
             completeSaleBtn.disabled = false;
         } else {
-            changeDisplay.textContent = `${currencySymbol}${Math.abs(change).toFixed(2)} (short)`;
+            changeDisplay.textContent = `${currencySymbol}${Math.abs(change).toFixed(2)} (${langShort})`;
             changeDisplay.classList.remove('text-success');
             changeDisplay.classList.add('text-danger');
             completeSaleBtn.disabled = true;

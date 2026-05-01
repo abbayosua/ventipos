@@ -5,16 +5,15 @@ $currencySymbol = e($currencySymbol);
 ?>
 
 <div class="pos-container p-2" id="posApp">
-    <!-- Products Panel -->
     <div class="pos-products">
         <div class="row g-2 mb-2">
             <div class="col-md-5">
                 <input type="text" id="posSearch" class="form-control form-control-sm"
-                       placeholder="Search by name, SKU or barcode..." autofocus>
+                       placeholder="<?= __('pos.search') ?>" autofocus>
             </div>
             <div class="col-md-3">
                 <select id="posCategory" class="form-select form-select-sm">
-                    <option value="">All Categories</option>
+                    <option value=""><?= __('pos.all_categories') ?></option>
                     <?php foreach ($categories as $cat): ?>
                         <option value="<?= $cat->id ?>"><?= e($cat->name) ?></option>
                     <?php endforeach; ?>
@@ -22,10 +21,10 @@ $currencySymbol = e($currencySymbol);
             </div>
             <div class="col-md-2">
                 <input type="text" id="posBarcode" class="form-control form-control-sm"
-                       placeholder="Scan barcode...">
+                       placeholder="<?= __('pos.scan_barcode') ?>">
             </div>
             <div class="col-md-2">
-                <button class="btn btn-sm btn-outline-secondary w-100" onclick="clearFilters()">Clear</button>
+                <button class="btn btn-sm btn-outline-secondary w-100" onclick="clearFilters()"><?= __('common.clear') ?></button>
             </div>
         </div>
 
@@ -45,7 +44,7 @@ $currencySymbol = e($currencySymbol);
                         <div class="card-body p-2 text-center">
                             <div class="mb-1 fw-bold small"><?= e($p->name) ?></div>
                             <div class="text-primary fw-bold"><?= $currencySymbol ?><?= number_format($p->selling_price, 2) ?></div>
-                            <small class="text-muted">Stock: <?= $p->stock_qty ?></small>
+                            <small class="text-muted"><?= __('pos.stock') ?>: <?= $p->stock_qty ?></small>
                         </div>
                     </div>
                 </div>
@@ -53,16 +52,15 @@ $currencySymbol = e($currencySymbol);
         </div>
     </div>
 
-    <!-- Cart Panel -->
     <div class="pos-cart card shadow-sm">
         <div class="card-header bg-white py-2 d-flex justify-content-between align-items-center">
-            <strong><i class="bi bi-cart"></i> Cart</strong>
+            <strong><i class="bi bi-cart"></i> <?= __('pos.cart') ?></strong>
             <span id="cartCount" class="badge bg-primary">0</span>
         </div>
 
         <div class="px-2 py-1 border-bottom">
             <select id="customerSelect" class="form-select form-select-sm">
-                <option value="">Walk-in Customer</option>
+                <option value=""><?= __('pos.walkin_customer') ?></option>
                 <?php foreach ($customers as $c): ?>
                     <option value="<?= $c->id ?>"><?= e($c->name) ?> (<?= e($c->phone) ?>)</option>
                 <?php endforeach; ?>
@@ -72,60 +70,57 @@ $currencySymbol = e($currencySymbol);
         <div class="pos-cart-items p-2" id="cartItems">
             <div class="text-center text-muted py-5">
                 <i class="bi bi-cart-plus fs-1"></i>
-                <p class="mt-2">Add products to start selling</p>
+                <p class="mt-2"><?= __('pos.add_product_hint') ?></p>
             </div>
         </div>
 
-        <!-- Inline Checkout Footer -->
         <div class="card-footer bg-white" id="cartFooter">
             <div class="d-flex justify-content-between small mb-1">
-                <span>Subtotal</span>
+                <span><?= __('common.subtotal') ?></span>
                 <span id="cartSubtotal"><?= $currencySymbol ?>0.00</span>
             </div>
 
             <div class="row g-1 mb-1">
                 <div class="col-5">
                     <select id="orderDiscountType" class="form-select form-select-sm">
-                        <option value="">No Discount</option>
-                        <option value="percentage">% Discount</option>
-                        <option value="fixed">Fixed Discount</option>
+                        <option value=""><?= __('pos.no_discount') ?></option>
+                        <option value="percentage"><?= __('pos.pct_discount') ?></option>
+                        <option value="fixed"><?= __('pos.fixed_discount') ?></option>
                     </select>
                 </div>
                 <div class="col-4">
                     <input type="number" id="orderDiscountValue" class="form-control form-control-sm" min="0" step="0.01"
-                           placeholder="Amount" disabled>
+                           placeholder="<?= __('common.amount') ?>" disabled>
                 </div>
                 <div class="col-3 d-flex align-items-center small text-danger" id="orderDiscountDisplay"></div>
             </div>
 
             <div class="d-flex justify-content-between small mb-1">
-                <span>Tax</span>
+                <span><?= __('common.tax') ?></span>
                 <span id="cartTax"><?= $currencySymbol ?>0.00</span>
             </div>
             <hr class="my-1">
             <div class="d-flex justify-content-between fw-bold fs-5">
-                <span>Total</span>
+                <span><?= __('common.total') ?></span>
                 <span id="cartTotal"><?= $currencySymbol ?>0.00</span>
             </div>
 
-            <!-- Payment Section -->
             <div id="paymentSection" class="d-none">
                 <hr class="my-2">
                 <div class="row g-1 mb-2">
                     <div class="col-6">
                         <select id="paymentMethod" class="form-select form-select-sm">
-                            <option value="cash">Cash</option>
-                            <option value="card">Card</option>
-                            <option value="transfer">Bank Transfer</option>
-                            <option value="other">Other</option>
+                            <option value="cash"><?= __('pos.cash') ?></option>
+                            <option value="card"><?= __('pos.card') ?></option>
+                            <option value="transfer"><?= __('pos.transfer') ?></option>
+                            <option value="other"><?= __('pos.other') ?></option>
                         </select>
                     </div>
                     <div class="col-6">
-                        <input type="text" id="notes" class="form-control form-control-sm" placeholder="Notes (optional)">
+                        <input type="text" id="notes" class="form-control form-control-sm" placeholder="<?= __('common.notes') ?>">
                     </div>
                 </div>
 
-                <!-- Quick Amount Buttons -->
                 <div class="d-flex gap-1 mb-2 flex-wrap" id="quickAmounts">
                     <button class="btn btn-outline-secondary btn-sm qty-btn" data-amount="500">500</button>
                     <button class="btn btn-outline-secondary btn-sm qty-btn" data-amount="1000">1k</button>
@@ -135,46 +130,44 @@ $currencySymbol = e($currencySymbol);
                     <button class="btn btn-outline-secondary btn-sm qty-btn" data-amount="20000">20k</button>
                     <button class="btn btn-outline-secondary btn-sm qty-btn" data-amount="50000">50k</button>
                     <button class="btn btn-outline-secondary btn-sm qty-btn" data-amount="100000">100k</button>
-                    <button class="btn btn-outline-secondary btn-sm qty-btn" id="btnExact">Exact</button>
+                    <button class="btn btn-outline-secondary btn-sm qty-btn" id="btnExact"><?= __('pos.exact') ?></button>
                 </div>
 
                 <div class="row g-1 mb-1 align-items-center">
-                    <div class="col-5"><label class="form-label small mb-0">Amount Paid</label></div>
+                    <div class="col-5"><label class="form-label small mb-0"><?= __('pos.amount_paid') ?></label></div>
                     <div class="col-7">
                         <input type="number" id="paidAmount" class="form-control form-control-sm" step="0.01" min="0" placeholder="0">
                     </div>
                 </div>
 
                 <div id="changeRow" class="d-flex justify-content-between fw-bold small d-none">
-                    <span>Change Due</span>
+                    <span><?= __('pos.change_due') ?></span>
                     <span id="changeDisplay" class="text-success"></span>
                 </div>
 
                 <button class="btn btn-success w-100 mt-2" id="completeSaleBtn" disabled>
-                    <i class="bi bi-check-lg"></i> Complete Sale
+                    <i class="bi bi-check-lg"></i> <?= __('pos.complete_sale') ?>
                 </button>
                 <button class="btn btn-outline-danger btn-sm w-100 mt-1" onclick="clearCart()" disabled id="clearCartBtn">
-                    <i class="bi bi-trash"></i> Clear Cart
+                    <i class="bi bi-trash"></i> <?= __('pos.clear_cart') ?>
                 </button>
             </div>
 
-            <!-- Empty cart: show this -->
             <div id="emptyCartActions">
                 <button class="btn btn-primary w-100 mt-2" id="checkoutBtn" disabled>
-                    <i class="bi bi-cash"></i> Checkout
+                    <i class="bi bi-cash"></i> <?= __('pos.complete_sale') ?>
                 </button>
                 <button class="btn btn-outline-danger btn-sm w-100 mt-1" onclick="clearCart()" disabled id="clearCartBtnEmpty">
-                    <i class="bi bi-trash"></i> Clear Cart
+                    <i class="bi bi-trash"></i> <?= __('pos.clear_cart') ?>
                 </button>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Receipt Toast -->
 <div id="receiptToast" class="toast position-fixed bottom-0 end-0 m-3 d-none" role="alert" aria-live="assertive" aria-atomic="true">
     <div class="toast-header bg-success text-white">
-        <strong class="me-auto"><i class="bi bi-check-circle"></i> Sale Complete</strong>
+        <strong class="me-auto"><i class="bi bi-check-circle"></i> <?= __('pos.sale_complete') ?></strong>
         <button type="button" class="btn-close btn-close-white" onclick="resetPOS()"></button>
     </div>
     <div class="toast-body" id="receiptBody"></div>
@@ -185,4 +178,5 @@ const products = <?= $productsJs ?>;
 const customers = <?= $customersJs ?>;
 const currencySymbol = '<?= $currencySymbol ?>';
 const baseUrl = '<?= baseUrl() ?>';
+const langShort = '<?= __('pos.short') ?>';
 </script>

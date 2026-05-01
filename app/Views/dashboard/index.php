@@ -1,10 +1,10 @@
-<h3 class="mb-4">Dashboard</h3>
+<h3 class="mb-4"><?= __('dashboard.title') ?></h3>
 
 <div class="row g-3 mb-4">
     <div class="col-md-3">
         <div class="card text-bg-primary">
             <div class="card-body">
-                <h5>Today's Sales</h5>
+                <h5><?= __('dashboard.todays_sales') ?></h5>
                 <h3><?= formatMoney($todaySales ?? 0) ?></h3>
             </div>
         </div>
@@ -12,7 +12,7 @@
     <div class="col-md-3">
         <div class="card text-bg-success">
             <div class="card-body">
-                <h5>Transactions</h5>
+                <h5><?= __('dashboard.transactions') ?></h5>
                 <h3><?= $todayCount ?? 0 ?></h3>
             </div>
         </div>
@@ -20,7 +20,7 @@
     <div class="col-md-3">
         <div class="card text-bg-warning">
             <div class="card-body">
-                <h5>Products</h5>
+                <h5><?= __('dashboard.products') ?></h5>
                 <h3><?= $productCount ?? 0 ?></h3>
             </div>
         </div>
@@ -28,7 +28,7 @@
     <div class="col-md-3">
         <div class="card text-bg-info">
             <div class="card-body">
-                <h5>Customers</h5>
+                <h5><?= __('dashboard.customers') ?></h5>
                 <h3><?= $customerCount ?? 0 ?></h3>
             </div>
         </div>
@@ -38,13 +38,13 @@
 <div class="row">
     <div class="col-md-6">
         <div class="card">
-            <div class="card-header">Low Stock Alerts</div>
+            <div class="card-header"><?= __('dashboard.low_stock') ?></div>
             <div class="card-body">
                 <?php if (empty($lowStock)): ?>
-                    <p class="text-muted mb-0">No low stock items.</p>
+                    <p class="text-muted mb-0"><?= __('dashboard.no_low_stock') ?></p>
                 <?php else: ?>
                     <table class="table table-sm">
-                        <thead><tr><th>Product</th><th>Qty</th></tr></thead>
+                        <thead><tr><th><?= __('common.name') ?></th><th><?= __('common.qty') ?></th></tr></thead>
                         <tbody>
                             <?php foreach ($lowStock as $item): ?>
                                 <tr>
@@ -60,7 +60,7 @@
     </div>
     <div class="col-md-6">
         <div class="card">
-            <div class="card-header">Today's Sales</div>
+            <div class="card-header"><?= __('dashboard.hourly_sales') ?></div>
             <div class="card-body">
                 <canvas id="salesChart" height="200"></canvas>
             </div>
@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', function () {
             data: {
                 labels: <?= json_encode($chartLabels ?? []) ?>,
                 datasets: [{
-                    label: 'Sales',
+                    label: '<?= __('dashboard.todays_sales') ?>',
                     data: <?= json_encode($chartData ?? []) ?>,
                     borderColor: '#0d6efd',
                     tension: 0.3

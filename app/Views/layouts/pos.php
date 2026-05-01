@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= e($title ?? 'POS') ?> - <?= e(config('app.name')) ?></title>
+    <title><?= __('pos.title') ?> - <?= e(config('app.name')) ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <link href="<?= assetUrl('css/style.css') ?>" rel="stylesheet">
@@ -13,11 +13,15 @@
     <nav class="navbar navbar-dark bg-dark px-3">
         <div class="d-flex align-items-center gap-3">
             <a href="<?= baseUrl('dashboard') ?>" class="btn btn-outline-light btn-sm">
-                <i class="bi bi-arrow-left"></i> Exit POS
+                <i class="bi bi-arrow-left"></i> <?= __('pos.exit') ?>
             </a>
-            <span class="navbar-brand mb-0 h6"><?= e(config('app.name')) ?> — POS</span>
+            <span class="navbar-brand mb-0 h6"><?= e(config('app.name')) ?> — <?= __('pos.title') ?></span>
         </div>
         <div class="d-flex align-items-center gap-2 text-white small">
+            <?php foreach (\App\Lang\Lang::available() as $code => $name): ?>
+                <a href="<?= baseUrl('lang/' . $code) ?>" class="text-white text-decoration-none <?= \App\Lang\Lang::locale() === $code ? 'fw-bold' : 'opacity-75' ?>"><?= $name ?></a>
+            <?php endforeach; ?>
+            <span class="text-secondary">|</span>
             <span><?= e(\App\Core\Session::get('outlet_name', '')) ?></span>
             <span class="text-secondary">|</span>
             <span><?= e(\App\Core\Session::get('user_name', '')) ?></span>
