@@ -7,7 +7,6 @@ $currencySymbol = e($currencySymbol);
 <div class="pos-container p-2" id="posApp">
     <!-- Products Panel -->
     <div class="pos-products">
-        <!-- Search & Filters -->
         <div class="row g-2 mb-2">
             <div class="col-md-5">
                 <input type="text" id="posSearch" class="form-control form-control-sm"
@@ -30,7 +29,6 @@ $currencySymbol = e($currencySymbol);
             </div>
         </div>
 
-        <!-- Product Grid -->
         <div class="row g-2" id="productGrid">
             <?php foreach ($products as $p): ?>
                 <div class="col-xl-3 col-lg-4 col-md-6 product-card"
@@ -62,7 +60,6 @@ $currencySymbol = e($currencySymbol);
             <span id="cartCount" class="badge bg-primary">0</span>
         </div>
 
-        <!-- Customer Select -->
         <div class="px-2 py-1 border-bottom">
             <select id="customerSelect" class="form-select form-select-sm">
                 <option value="">Walk-in Customer</option>
@@ -72,7 +69,6 @@ $currencySymbol = e($currencySymbol);
             </select>
         </div>
 
-        <!-- Cart Items -->
         <div class="pos-cart-items p-2" id="cartItems">
             <div class="text-center text-muted py-5">
                 <i class="bi bi-cart-plus fs-1"></i>
@@ -80,14 +76,13 @@ $currencySymbol = e($currencySymbol);
             </div>
         </div>
 
-        <!-- Totals -->
-        <div class="card-footer bg-white">
+        <!-- Inline Checkout Footer -->
+        <div class="card-footer bg-white" id="cartFooter">
             <div class="d-flex justify-content-between small mb-1">
                 <span>Subtotal</span>
                 <span id="cartSubtotal"><?= $currencySymbol ?>0.00</span>
             </div>
 
-            <!-- Order Discount -->
             <div class="row g-1 mb-1">
                 <div class="col-5">
                     <select id="orderDiscountType" class="form-select form-select-sm">
@@ -112,81 +107,77 @@ $currencySymbol = e($currencySymbol);
                 <span>Total</span>
                 <span id="cartTotal"><?= $currencySymbol ?>0.00</span>
             </div>
-            <button class="btn btn-primary w-100 mt-2" onclick="openCheckout()" id="checkoutBtn" disabled>
-                <i class="bi bi-cash"></i> Checkout
-            </button>
-            <button class="btn btn-outline-danger btn-sm w-100 mt-1" onclick="clearCart()" disabled id="clearCartBtn">
-                <i class="bi bi-trash"></i> Clear Cart
-            </button>
-        </div>
-    </div>
-</div>
 
-<!-- Checkout Modal -->
-<div class="modal fade" id="checkoutModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Checkout</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <form id="checkoutForm">
-                <div class="modal-body">
-                    <div class="d-flex justify-content-between mb-3">
-                        <span class="fw-bold">Total:</span>
-                        <span class="fw-bold fs-4" id="checkoutTotal"><?= $currencySymbol ?>0.00</span>
-                    </div>
-                    <input type="hidden" name="items" id="checkoutItems">
-                    <input type="hidden" name="customer_id" id="checkoutCustomerId">
-                    <input type="hidden" name="discount_type" id="checkoutDiscountType">
-                    <input type="hidden" name="discount_value" id="checkoutDiscountValue">
-                    <div class="mb-3">
-                        <label class="form-label">Payment Method</label>
-                        <select name="payment_method" class="form-select" required>
+            <!-- Payment Section -->
+            <div id="paymentSection" class="d-none">
+                <hr class="my-2">
+                <div class="row g-1 mb-2">
+                    <div class="col-6">
+                        <select id="paymentMethod" class="form-select form-select-sm">
                             <option value="cash">Cash</option>
                             <option value="card">Card</option>
                             <option value="transfer">Bank Transfer</option>
                             <option value="other">Other</option>
                         </select>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Amount Paid</label>
-                        <input type="number" name="paid_amount" class="form-control form-control-lg" step="0.01" min="0"
-                               id="paidAmount" required>
-                    </div>
-                    <div id="changeDisplay" class="text-end text-success fw-bold d-none"></div>
-                    <div class="mb-3">
-                        <label class="form-label">Notes (optional)</label>
-                        <textarea name="notes" class="form-control" rows="2"></textarea>
+                    <div class="col-6">
+                        <input type="text" id="notes" class="form-control form-control-sm" placeholder="Notes (optional)">
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary" id="submitCheckout">
-                        <i class="bi bi-check-lg"></i> Complete Sale
-                    </button>
+
+                <!-- Quick Amount Buttons -->
+                <div class="d-flex gap-1 mb-2 flex-wrap" id="quickAmounts">
+                    <button class="btn btn-outline-secondary btn-sm qty-btn" data-amount="500">500</button>
+                    <button class="btn btn-outline-secondary btn-sm qty-btn" data-amount="1000">1k</button>
+                    <button class="btn btn-outline-secondary btn-sm qty-btn" data-amount="2000">2k</button>
+                    <button class="btn btn-outline-secondary btn-sm qty-btn" data-amount="5000">5k</button>
+                    <button class="btn btn-outline-secondary btn-sm qty-btn" data-amount="10000">10k</button>
+                    <button class="btn btn-outline-secondary btn-sm qty-btn" data-amount="20000">20k</button>
+                    <button class="btn btn-outline-secondary btn-sm qty-btn" data-amount="50000">50k</button>
+                    <button class="btn btn-outline-secondary btn-sm qty-btn" data-amount="100000">100k</button>
+                    <button class="btn btn-outline-secondary btn-sm qty-btn" id="btnExact">Exact</button>
                 </div>
-            </form>
+
+                <div class="row g-1 mb-1 align-items-center">
+                    <div class="col-5"><label class="form-label small mb-0">Amount Paid</label></div>
+                    <div class="col-7">
+                        <input type="number" id="paidAmount" class="form-control form-control-sm" step="0.01" min="0" placeholder="0">
+                    </div>
+                </div>
+
+                <div id="changeRow" class="d-flex justify-content-between fw-bold small d-none">
+                    <span>Change Due</span>
+                    <span id="changeDisplay" class="text-success"></span>
+                </div>
+
+                <button class="btn btn-success w-100 mt-2" id="completeSaleBtn" disabled>
+                    <i class="bi bi-check-lg"></i> Complete Sale
+                </button>
+                <button class="btn btn-outline-danger btn-sm w-100 mt-1" onclick="clearCart()" disabled id="clearCartBtn">
+                    <i class="bi bi-trash"></i> Clear Cart
+                </button>
+            </div>
+
+            <!-- Empty cart: show this -->
+            <div id="emptyCartActions">
+                <button class="btn btn-primary w-100 mt-2" id="checkoutBtn" disabled>
+                    <i class="bi bi-cash"></i> Checkout
+                </button>
+                <button class="btn btn-outline-danger btn-sm w-100 mt-1" onclick="clearCart()" disabled id="clearCartBtnEmpty">
+                    <i class="bi bi-trash"></i> Clear Cart
+                </button>
+            </div>
         </div>
     </div>
 </div>
 
-<!-- Receipt Modal -->
-<div class="modal fade" id="receiptModal" tabindex="-1">
-    <div class="modal-dialog modal-sm">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Sale Complete</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" onclick="resetPOS()"></button>
-            </div>
-            <div class="modal-body text-center" id="receiptBody">
-            </div>
-            <div class="modal-footer justify-content-center">
-                <button class="btn btn-primary" onclick="window.print()"><i class="bi bi-printer"></i> Print</button>
-                <button class="btn btn-secondary" data-bs-dismiss="modal" onclick="resetPOS()">New Sale</button>
-            </div>
-        </div>
+<!-- Receipt Toast -->
+<div id="receiptToast" class="toast position-fixed bottom-0 end-0 m-3 d-none" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast-header bg-success text-white">
+        <strong class="me-auto"><i class="bi bi-check-circle"></i> Sale Complete</strong>
+        <button type="button" class="btn-close btn-close-white" onclick="resetPOS()"></button>
     </div>
+    <div class="toast-body" id="receiptBody"></div>
 </div>
 
 <script>

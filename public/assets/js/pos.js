@@ -1,4 +1,3 @@
-// State
 let cart = [];
 let orderDiscountType = '';
 let orderDiscountValue = 0;
@@ -15,8 +14,13 @@ const cartTax = document.getElementById('cartTax');
 const cartTotal = document.getElementById('cartTotal');
 const checkoutBtn = document.getElementById('checkoutBtn');
 const clearCartBtn = document.getElementById('clearCartBtn');
+const paymentSection = document.getElementById('paymentSection');
+const emptyCartActions = document.getElementById('emptyCartActions');
+const completeSaleBtn = document.getElementById('completeSaleBtn');
+const paidAmount = document.getElementById('paidAmount');
+const changeDisplay = document.getElementById('changeDisplay');
+const changeRow = document.getElementById('changeRow');
 
-// Init
 document.addEventListener('DOMContentLoaded', function () {
     if (searchInput) {
         searchInput.addEventListener('input', debounce(filterProducts, 300));
@@ -42,7 +46,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Order discount
     const discountType = document.getElementById('orderDiscountType');
     const discountValue = document.getElementById('orderDiscountValue');
     if (discountType) {
@@ -61,16 +64,51 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Checkout form
-    const checkoutForm = document.getElementById('checkoutForm');
-    if (checkoutForm) {
-        const paidInput = document.getElementById('paidAmount');
-        paidInput.addEventListener('input', updateChange);
-        checkoutForm.addEventListener('submit', submitCheckout);
+    // Quick amount buttons
+    document.querySelectorAll('.qty-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+            if (this.id === 'btnExact') {
+                const total = getTotal();
+                paidAmount.value = total.toFixed(2);
+            } else {
+                const val = parseFloat(this.dataset.amount);
+                paidAmount.value = val.toFixed(2);
+            }
+            updateChange();
+        });
+    });
+
+    // Paid amount input
+    if (paidAmount) {
+        paidAmount.addEventListener('input', updateChange);
+        paidAmount.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                completeSale();
+            }
+        });
     }
+
+    // Complete sale button
+    if (completeSaleBtn) {
+        completeSaleBtn.addEventListener('click', completeSale);
+    }
+
+    // Focus product search on keypress anywhere
+    document.addEventListener('keydown', function (e) {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') return;
+        if (e.key === 'Escape') resetPOS();
+        if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+            searchInput.focus();
+        }
+    });
 });
 
-// Add to cart
+function getTotal() {
+    const total = parseFloat(cartTotal.textContent.replace(/[^0-9.-]/g, ''));
+    return isNaN(total) ? 0 : total;
+}
+
 function addToCart(productId) {
     const product = products.find(p => p.id == productId);
     if (!product) return;
@@ -94,22 +132,26 @@ function addToCart(productId) {
             discount_value: 0,
         });
     }
-
     renderCart();
 }
 
-// Render cart
 function renderCart() {
     if (cart.length === 0) {
         cartItems.innerHTML = '<div class="text-center text-muted py-5"><i class="bi bi-cart-plus fs-1"></i><p class="mt-2">Add products to start selling</p></div>';
         checkoutBtn.disabled = true;
-        clearCartBtn.disabled = true;
+        if (clearCartBtn) clearCartBtn.disabled = true;
+        const clearBtnEmpty = document.getElementById('clearCartBtnEmpty');
+        if (clearBtnEmpty) clearBtnEmpty.disabled = true;
+        paymentSection.classList.add('d-none');
+        emptyCartActions.classList.remove('d-none');
         updateTotals();
         return;
     }
 
     checkoutBtn.disabled = false;
-    clearCartBtn.disabled = false;
+    if (clearCartBtn) clearCartBtn.disabled = false;
+    const clearBtnEmpty = document.getElementById('clearCartBtnEmpty');
+    if (clearBtnEmpty) clearBtnEmpty.disabled = false;
 
     let html = '';
     cart.forEach((item, index) => {
@@ -142,7 +184,7 @@ function renderCart() {
                     </div>
                 </div>
                 <div class="d-flex gap-1 mt-1">
-                    <select class="form-select form-select-sm" style="width:auto;" onchange="itemDiscount(${index}, this.value, '${item.discount_type || ''}')">
+                    <select class="form-select form-select-sm" style="width:auto;" onchange="itemDiscount(${index}, this.value)">
                         <option value="">No disc</option>
                         <option value="percentage" ${item.discount_type === 'percentage' ? 'selected' : ''}>%</option>
                         <option value="fixed" ${item.discount_type === 'fixed' ? 'selected' : ''}>Fixed</option>
@@ -162,7 +204,6 @@ function renderCart() {
     updateTotals();
 }
 
-// Update quantity
 function updateQty(index, delta) {
     const product = products.find(p => p.id == cart[index].product_id);
     cart[index].quantity += delta;
@@ -175,7 +216,6 @@ function updateQty(index, delta) {
     renderCart();
 }
 
-// Item discount
 function itemDiscount(index, type) {
     cart[index].discount_type = type || null;
     if (!type) cart[index].discount_value = 0;
@@ -187,13 +227,11 @@ function itemDiscountValue(index, val) {
     renderCart();
 }
 
-// Remove item
 function removeItem(index) {
     cart.splice(index, 1);
     renderCart();
 }
 
-// Update totals
 function updateTotals() {
     let subtotal = 0;
     let totalTax = 0;
@@ -234,9 +272,41 @@ function updateTotals() {
     cartSubtotal.textContent = `${currencySymbol}${subtotal.toFixed(2)}`;
     cartTax.textContent = `${currencySymbol}${totalTax.toFixed(2)}`;
     cartTotal.textContent = `${currencySymbol}${total.toFixed(2)}`;
+
+    // Toggle payment section visibility
+    if (cart.length > 0) {
+        paymentSection.classList.remove('d-none');
+        emptyCartActions.classList.add('d-none');
+    } else {
+        paymentSection.classList.add('d-none');
+        emptyCartActions.classList.remove('d-none');
+    }
 }
 
-// Filter products
+function updateChange() {
+    const total = getTotal();
+    const paid = parseFloat(paidAmount.value) || 0;
+    const change = paid - total;
+
+    if (paid > 0) {
+        changeRow.classList.remove('d-none');
+        if (paid >= total) {
+            changeDisplay.textContent = `${currencySymbol}${change.toFixed(2)}`;
+            changeDisplay.classList.remove('text-danger');
+            changeDisplay.classList.add('text-success');
+            completeSaleBtn.disabled = false;
+        } else {
+            changeDisplay.textContent = `${currencySymbol}${Math.abs(change).toFixed(2)} (short)`;
+            changeDisplay.classList.remove('text-success');
+            changeDisplay.classList.add('text-danger');
+            completeSaleBtn.disabled = true;
+        }
+    } else {
+        changeRow.classList.add('d-none');
+        completeSaleBtn.disabled = true;
+    }
+}
+
 function filterProducts() {
     const query = (searchInput.value || '').toLowerCase();
     const catId = categorySelect.value;
@@ -261,7 +331,6 @@ function clearFilters() {
     filterProducts();
 }
 
-// Clear cart
 function clearCart() {
     if (cart.length === 0) return;
     if (!confirm('Clear the entire cart?')) return;
@@ -269,71 +338,34 @@ function clearCart() {
     renderCart();
 }
 
-// Open checkout modal
-function openCheckout() {
+async function completeSale() {
     if (cart.length === 0) return;
 
-    updateTotals();
-
-    const totalEl = document.getElementById('checkoutTotal');
-    const subtotal = parseFloat(cartSubtotal.textContent.replace(/[^0-9.-]/g, ''));
-    const tax = parseFloat(cartTax.textContent.replace(/[^0-9.-]/g, ''));
-    let orderDiscount = 0;
-    if (orderDiscountType === 'percentage') {
-        orderDiscount = subtotal * (orderDiscountValue / 100);
-    } else if (orderDiscountType === 'fixed') {
-        orderDiscount = Math.min(orderDiscountValue, subtotal);
+    const total = getTotal();
+    const paid = parseFloat(paidAmount.value) || 0;
+    if (paid < total) {
+        alert('Amount paid is less than the total!');
+        return;
     }
-    const total = subtotal - orderDiscount + tax;
 
-    totalEl.textContent = `${currencySymbol}${total.toFixed(2)}`;
-    document.getElementById('paidAmount').value = total.toFixed(2);
-    document.getElementById('paidAmount').min = total.toFixed(2);
-    document.getElementById('checkoutItems').value = JSON.stringify(cart.map(item => ({
+    completeSaleBtn.disabled = true;
+    completeSaleBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Processing...';
+
+    const items = cart.map(item => ({
         product_id: item.product_id,
         quantity: item.quantity,
         discount_type: item.discount_type || null,
         discount_value: item.discount_value || 0,
-    })));
-    document.getElementById('checkoutCustomerId').value = document.getElementById('customerSelect').value;
-    document.getElementById('checkoutDiscountType').value = orderDiscountType || '';
-    document.getElementById('checkoutDiscountValue').value = orderDiscountValue || 0;
+    }));
 
-    const changeDisplay = document.getElementById('changeDisplay');
-    changeDisplay.classList.add('d-none');
-
-    const modal = new bootstrap.Modal(document.getElementById('checkoutModal'));
-    modal.show();
-    setTimeout(() => document.getElementById('paidAmount').select(), 300);
-}
-
-// Update change
-function updateChange() {
-    const totalText = document.getElementById('checkoutTotal').textContent.replace(/[^0-9.-]/g, '');
-    const total = parseFloat(totalText) || 0;
-    const paid = parseFloat(document.getElementById('paidAmount').value) || 0;
-    const change = paid - total;
-    const changeDisplay = document.getElementById('changeDisplay');
-    if (paid >= total) {
-        changeDisplay.textContent = `Change: ${currencySymbol}${change.toFixed(2)}`;
-        changeDisplay.classList.remove('d-none', 'text-danger');
-        changeDisplay.classList.add('text-success');
-    } else {
-        changeDisplay.textContent = `Short: ${currencySymbol}${Math.abs(change).toFixed(2)}`;
-        changeDisplay.classList.remove('d-none', 'text-success');
-        changeDisplay.classList.add('text-danger');
-    }
-}
-
-// Submit checkout
-async function submitCheckout(e) {
-    e.preventDefault();
-
-    const btn = document.getElementById('submitCheckout');
-    btn.disabled = true;
-    btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Processing...';
-
-    const formData = new FormData(document.getElementById('checkoutForm'));
+    const formData = new FormData();
+    formData.append('items', JSON.stringify(items));
+    formData.append('payment_method', document.getElementById('paymentMethod').value);
+    formData.append('paid_amount', paid.toString());
+    formData.append('customer_id', document.getElementById('customerSelect').value || '');
+    formData.append('discount_type', orderDiscountType || '');
+    formData.append('discount_value', (orderDiscountValue || 0).toString());
+    formData.append('notes', document.getElementById('notes').value || '');
 
     try {
         const response = await fetch(baseUrl + 'pos/checkout', {
@@ -345,38 +377,38 @@ async function submitCheckout(e) {
 
         if (data.error) {
             alert('Error: ' + data.error);
-            btn.disabled = false;
-            btn.innerHTML = '<i class="bi bi-check-lg"></i> Complete Sale';
+            completeSaleBtn.disabled = false;
+            completeSaleBtn.innerHTML = '<i class="bi bi-check-lg"></i> Complete Sale';
             return;
         }
 
-        bootstrap.Modal.getInstance(document.getElementById('checkoutModal')).hide();
-
-        // Show receipt
-        const receiptBody = document.getElementById('receiptBody');
-        receiptBody.innerHTML = `
-            <h5>VentiPOS</h5>
-            <p class="mb-1">Invoice: ${data.invoice_no}</p>
-            <hr>
-            ${cart.map(item => `<div class="d-flex justify-content-between"><span>${escapeHtml(item.name)} × ${item.quantity}</span><span>${currencySymbol}${(item.price * item.quantity).toFixed(2)}</span></div>`).join('')}
-            <hr>
+        // Show receipt toast
+        const toast = document.getElementById('receiptToast');
+        const body = document.getElementById('receiptBody');
+        body.innerHTML = `
+            <div class="text-center mb-2">
+                <strong>${data.invoice_no}</strong>
+            </div>
+            ${cart.map(item => `<div class="d-flex justify-content-between small"><span>${escapeHtml(item.name)} × ${item.quantity}</span><span>${currencySymbol}${(item.price * item.quantity).toFixed(2)}</span></div>`).join('')}
+            <hr class="my-1">
             <div class="d-flex justify-content-between fw-bold"><span>Total</span><span>${currencySymbol}${data.total.toFixed(2)}</span></div>
-            <div class="d-flex justify-content-between"><span>Paid</span><span>${currencySymbol}${(parseFloat(document.getElementById('paidAmount').value) || 0).toFixed(2)}</span></div>
-            <div class="d-flex justify-content-between text-success"><span>Change</span><span>${currencySymbol}${data.change.toFixed(2)}</span></div>
-            <hr>
-            <p class="mb-0 text-muted">Thank you!</p>
+            <div class="d-flex justify-content-between small"><span>Paid</span><span>${currencySymbol}${paid.toFixed(2)}</span></div>
+            <div class="d-flex justify-content-between small text-success"><span>Change</span><span>${currencySymbol}${data.change.toFixed(2)}</span></div>
+            <hr class="my-1">
+            <div class="d-flex gap-2 mt-2">
+                <button class="btn btn-sm btn-outline-primary flex-grow-1" onclick="window.print();return false;"><i class="bi bi-printer"></i> Print</button>
+                <button class="btn btn-sm btn-success flex-grow-1" onclick="resetPOS()"><i class="bi bi-plus-lg"></i> New Sale</button>
+            </div>
         `;
-
-        const receiptModal = new bootstrap.Modal(document.getElementById('receiptModal'));
-        receiptModal.show();
+        toast.classList.remove('d-none');
+        setTimeout(() => toast.classList.add('show'), 10);
     } catch (err) {
         alert('Checkout failed: ' + err.message);
-        btn.disabled = false;
-        btn.innerHTML = '<i class="bi bi-check-lg"></i> Complete Sale';
+        completeSaleBtn.disabled = false;
+        completeSaleBtn.innerHTML = '<i class="bi bi-check-lg"></i> Complete Sale';
     }
 }
 
-// Reset POS
 function resetPOS() {
     cart = [];
     orderDiscountType = '';
@@ -384,10 +416,14 @@ function resetPOS() {
     document.getElementById('orderDiscountType').value = '';
     document.getElementById('orderDiscountValue').value = '';
     document.getElementById('orderDiscountValue').disabled = true;
+    paidAmount.value = '';
+    changeRow.classList.add('d-none');
+    document.getElementById('notes').value = '';
+    document.getElementById('receiptToast').classList.add('d-none');
+    document.getElementById('receiptToast').classList.remove('show');
     renderCart();
 }
 
-// Helpers
 function debounce(fn, delay) {
     let timer;
     return function (...args) {

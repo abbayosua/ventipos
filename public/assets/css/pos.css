@@ -58,7 +58,25 @@
     font-size: .75rem;
 }
 
-/* Checkout modal receipt */
+/* Quick amount buttons */
+.qty-btn {
+    min-width: 48px;
+    font-size: .75rem;
+    font-weight: 600;
+}
+
+.qty-btn:hover {
+    background: #0d6efd;
+    color: #fff;
+    border-color: #0d6efd;
+}
+
+/* Receipt toast */
+#receiptToast {
+    width: 320px;
+    z-index: 1050;
+}
+
 #receiptBody {
     font-family: 'Courier New', monospace;
     font-size: .8rem;
