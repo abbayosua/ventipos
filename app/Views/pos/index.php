@@ -172,10 +172,15 @@ $currencySymbol = e($currencySymbol);
         </div>
         <div class="receipt-modal-body" id="receiptBody"></div>
         <div class="receipt-modal-footer">
-            <button class="btn btn-outline-primary" onclick="window.print()"><i class="bi bi-printer"></i> <?= __('common.print') ?></button>
+            <button class="btn btn-outline-primary" onclick="printReceipt()"><i class="bi bi-printer"></i> <?= __('common.print') ?></button>
             <button class="btn btn-success" onclick="resetPOS()"><i class="bi bi-plus-lg"></i> <?= __('pos.new_sale') ?></button>
         </div>
     </div>
+</div>
+
+<!-- Print-only receipt -->
+<div id="printReceipt" class="d-none">
+    <div class="print-receipt-content" id="printReceiptContent"></div>
 </div>
 
 <script>
@@ -184,4 +189,6 @@ const customers = <?= $customersJs ?>;
 const currencySymbol = '<?= $currencySymbol ?>';
 const baseUrl = '<?= baseUrl() ?>';
 const langShort = '<?= __('pos.short') ?>';
+const storeName = '<?= e(\App\Core\Session::get('company_name', config('app.name'))) ?>';
+const storeAddress = '<?= e(\App\Core\Session::get('company_address', '')) ?>';
 </script>

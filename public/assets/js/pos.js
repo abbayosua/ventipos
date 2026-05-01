@@ -401,6 +401,52 @@ async function completeSale() {
     }
 }
 
+function printReceipt() {
+    const overlay = document.getElementById('receiptOverlay');
+    const printContent = document.getElementById('printReceiptContent');
+    const body = document.getElementById('receiptBody');
+
+    // Copy receipt data with proper formatting
+    const now = new Date();
+    const dateStr = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    // Get invoice and totals from the receipt body
+    const invoiceMatch = body.innerHTML.match(/(INV-\S+)/);
+    const invoiceNo = invoiceMatch ? invoiceMatch[1] : '-';
+
+    printContent.innerHTML = `
+        <div class="receipt-store">${escapeHtml(storeName)}</div>
+        <div class="receipt-address">${escapeHtml(storeAddress)}</div>
+        <div class="receipt-line">${'='.repeat(32)}</div>
+        <div class="receipt-row"><span>Invoice</span><span>${invoiceNo}</span></div>
+        <div class="receipt-row"><span>Date</span><span>${dateStr}</span></div>
+        <div class="receipt-line">${'-'.repeat(32)}</div>
+        ${cart.map(item => `
+            <div class="receipt-item">
+                <div class="receipt-item-name">${escapeHtml(item.name)}</div>
+                <div class="receipt-item-qty">${item.quantity} × ${currencySymbol}${item.price.toFixed(2)}</div>
+                <div class="receipt-item-total">${currencySymbol}${(item.price * item.quantity).toFixed(2)}</div>
+            </div>
+        `).join('')}
+        <div class="receipt-line">${'-'.repeat(32)}</div>
+        <div class="receipt-row fw-bold"><span>Total</span><span>${cartTotal.textContent}</span></div>
+        <div class="receipt-row"><span>Paid</span><span>${currencySymbol}${paidAmount.value}</span></div>
+        <div class="receipt-row text-success"><span>Change</span><span>${changeDisplay.textContent}</span></div>
+        <div class="receipt-line">${'='.repeat(32)}</div>
+        <div class="receipt-footer">${escapeHtml(__('pos.thank_you'))}</div>
+    `;
+
+    overlay.classList.add('d-none');
+    const printEl = document.getElementById('printReceipt');
+    printEl.classList.remove('d-none');
+
+    setTimeout(() => {
+        window.print();
+        printEl.classList.add('d-none');
+        overlay.classList.remove('d-none');
+    }, 100);
+}
+
 function resetPOS() {
     cart = [];
     orderDiscountType = '';
