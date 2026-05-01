@@ -29,7 +29,7 @@ class App
         $this->router->post('/login', 'AuthController@login');
         $this->router->get('/logout', 'AuthController@logout');
         $this->router->get('/register', 'AuthController@registerForm');
-        $this->router->post('/register', 'AuthController@register');
+        $this->router->post('/register', 'AuthController@registerForm');
 
         $this->router->get('/lang/{locale}', 'AuthController@switchLang');
 
