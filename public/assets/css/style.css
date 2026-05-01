@@ -84,3 +84,34 @@ body {
     font-size: .85rem;
     margin-bottom: .25rem;
 }
+
+/* Print: hide sidebar, navbar, buttons */
+@media print {
+    html, body {
+        margin: 0 !important;
+        padding: 0 !important;
+        background: white;
+    }
+    .sidebar, .navbar, .btn, .btn-sm, button, form, .nav-tabs, .card-header .btn {
+        display: none !important;
+    }
+    .d-flex {
+        display: block !important;
+    }
+    [style*="margin-left"] {
+        margin-left: 0 !important;
+    }
+    .card {
+        border: none !important;
+        box-shadow: none !important;
+    }
+    .card-body {
+        padding: 0 !important;
+    }
+    .table {
+        font-size: 9pt !important;
+    }
+    @page {
+        margin: 10mm;
+    }
+}
