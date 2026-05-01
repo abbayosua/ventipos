@@ -498,45 +498,36 @@ function openBarcodeScanner(mode) {
     result.classList.add('d-none');
     container.innerHTML = '';
 
-    if (typeof Html5Qrcode === 'undefined') {
-        loadScript('https://cdn.jsdelivr.net/npm/html5-qrcode/dist/html5-qrcode.min.js', function () {
-            startScanner();
+    function startScanner() {
+        Html5Qrcode.getCameras().then(function (cameras) {
+            if (cameras.length === 0) { alert('No camera found.'); return; }
+            var camId = cameras[cameras.length - 1].id;
+            html5Scanner = new Html5Qrcode('scannerContainer');
+            html5Scanner.start(camId, { fps: 10, qrbox: { width: 250, height: 150 } },
+                function (decodedText) {
+                    closeBarcodeScanner();
+                    if (scannerMode === 'pos') handleBarcode(decodedText);
+                    else if (scannerMode === 'product') {
+                        document.getElementById('productBarcode').value = decodedText;
+                        lookupBarcode();
+                    }
+                },
+                function () {}
+            ).catch(function (err) {
+                alert('Camera error: ' + err);
+                closeBarcodeScanner();
+            });
+        }).catch(function (err) {
+            alert('Camera access denied: ' + err);
+            closeBarcodeScanner();
         });
+    }
+
+    if (typeof Html5Qrcode === 'undefined') {
+        loadScript('https://cdn.jsdelivr.net/npm/html5-qrcode/dist/html5-qrcode.min.js', startScanner);
         return;
     }
     startScanner();
-
-    function startScanner() {
-    Html5Qrcode.getCameras().then(function (cameras) {
-        if (cameras.length === 0) { alert('No camera found.'); return; }
-        const cameraId = cameras[cameras.length - 1].id; // prefer rear camera
-        html5Scanner = new Html5Qrcode('scannerContainer');
-        html5Scanner.start(
-            cameraId,
-            { fps: 10, qrbox: { width: 250, height: 150 } },
-            function (decodedText) {
-                closeBarcodeScanner();
-                if (scannerMode === 'pos') {
-                    handleBarcode(decodedText);
-                } else if (scannerMode === 'product') {
-                    document.getElementById('productBarcode').value = decodedText;
-                    lookupBarcode();
-                }
-            },
-            function () { /* keep scanning */ }
-        ).catch(function (err) {
-            alert('Camera error: ' + err);
-            closeBarcodeScanner();
-        });
-        }).catch(function (err) {
-            alert('Camera error: ' + err);
-            closeBarcodeScanner();
-        });
-    }).catch(function (err) {
-        alert('Camera access denied: ' + err);
-        closeBarcodeScanner();
-    });
-    }
 }
 
 function loadScript(url, callback) {
