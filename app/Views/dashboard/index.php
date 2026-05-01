@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', function () {
             data: {
                 labels: <?= json_encode($chartLabels ?? []) ?>,
                 datasets: [{
-                    label: '<?= __('dashboard.todays_sales') ?>',
+                    label: <?= json_encode(__('dashboard.todays_sales')) ?>,
                     data: <?= json_encode($chartData ?? []) ?>,
                     borderColor: '#0d6efd',
                     tension: 0.3

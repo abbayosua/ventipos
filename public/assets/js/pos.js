@@ -433,7 +433,7 @@ function printReceipt() {
         <div class="receipt-row"><span>Paid</span><span>${currencySymbol}${paidAmount.value}</span></div>
         <div class="receipt-row text-success"><span>Change</span><span>${changeDisplay.textContent}</span></div>
         <div class="receipt-line">${'='.repeat(32)}</div>
-        <div class="receipt-footer">${escapeHtml(__('pos.thank_you'))}</div>
+        <div class="receipt-footer">${escapeHtml(langThankYou)}</div>
     `;
 
     overlay.classList.add('d-none');

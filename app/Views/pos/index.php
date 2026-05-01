@@ -189,6 +189,7 @@ const customers = <?= $customersJs ?>;
 const currencySymbol = '<?= $currencySymbol ?>';
 const baseUrl = '<?= baseUrl() ?>';
 const langShort = '<?= __('pos.short') ?>';
-const storeName = '<?= e(\App\Core\Session::get('company_name', config('app.name'))) ?>';
-const storeAddress = '<?= e(\App\Core\Session::get('company_address', '')) ?>';
+const langThankYou = <?= json_encode(__('pos.thank_you')) ?>;
+const storeName = <?= json_encode(\App\Core\Session::get('company_name', config('app.name'))) ?>;
+const storeAddress = <?= json_encode(\App\Core\Session::get('company_address', '')) ?>;
 </script>
